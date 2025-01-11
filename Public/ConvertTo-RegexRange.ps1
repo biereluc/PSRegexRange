@@ -18,6 +18,10 @@ function ConvertTo-RegexRange
         [switch]$Shorthand
     )
 
+    if ((-not $Min -as [int]) -and (-not $Max -as [int]))
+    {
+        throw "Min and Max must be integers"
+    }
 
     $Options = @{
         RelaxZeros = $RelaxZeros.IsPresent
@@ -31,7 +35,7 @@ function ConvertTo-RegexRange
     $key = "$min`:$max=$($Options.RelaxZeros)$($Options.Shorthand)$($Options.Capture)$($Options.Wrap)"
 
     #TODO get-content $tmpfile
-    #if ($Global:RegexRange -and $Global:RegexRange.ContainsKey($key)) { return $Global:RegexRange[$key] }
+    if ($Global:RegexRange -and $Global:RegexRange.ContainsKey($key)) { return $Global:RegexRange[$key] }
 
 
     if ($null -eq $Max -or $Min -eq $Max)
@@ -101,27 +105,9 @@ function ConvertTo-RegexRange
 Get-ChildItem -Path '..\Private\*.ps1' | ForEach-Object { . $_.FullName }
 Get-ChildItem -Path .\Write-RegexRangeColorized.ps1 | ForEach-Object { . $_.FullName }
 
-
-#! Test
-$Min = 16
-$Max = 115
-Write-RegexRangeColorized -Min $min -Max $max
-
 #! Test
 0..15 | ForEach-Object {
     $max = Get-Random -Maximum 1000 -Minimum 1
     $min = Get-Random -Maximum $max -Minimum 0
-    Write-RegexRangeColorized -Min $min -Max $max
-    Pause
+    ConvertTo-RegexRange -Min $min -Max $max | Write-RegexRangeColorized -Min $min -Max $max -Wait -Boundary 2
 }
-
-#! Erreur à  corriger
-#44-579 !!!589 +10
-# 37-839 !!!-849 +10
-
-# 0-9
-#59-387
-# 121-580
-# 53-926 ||| 931 +5
-#60-272 !!! 277 +5
-# 160-428

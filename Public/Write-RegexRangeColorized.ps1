@@ -4,21 +4,20 @@ function Write-RegexRangeColorized
     param (
         [Parameter(Mandatory)]
         [int]$Min,
-        [Parameter(Mandatory = $false)]
+        [Parameter()]
         [int]$Max,
-        [Parameter(Mandatory = $false)]
+        [Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [string]$Regex,
+        [Parameter()]
         [int]$Boundary = 10,
-        [Parameter(Mandatory = $false)]
-        [string]$RegexRange
+        [Parameter()]
+        [switch]$Wait
     )
+    if (-not $Regex)
+    {
+        $regex = ConvertTo-RegexRange -Min $Min -Max $Max
+    }
 
-    # Génère le pattern regex
-    $regex = ConvertTo-RegexRange -Min $Min -Max $Max
-
-    # Affiche les informations
-    Write-Host "Regex: $regex" -ForegroundColor Yellow
-    Write-Host "Min: $Min" -ForegroundColor Yellow
-    Write-Host "Max: $Max" -ForegroundColor Yellow
 
     # Test les valeurs autour de la plage
     $rangeStart = $Min - $Boundary
@@ -28,8 +27,20 @@ function Write-RegexRangeColorized
         $currentValue = $_
         $match = [regex]::Match($currentValue, $regex)
 
-        # Affiche selon le type de correspondance
-        if ($match.Success -and $match.Value -eq $currentValue)
+        if (($Min -eq $currentValue) -or ($Max -eq $currentValue))
+        {
+            Write-Host $currentValue -ForegroundColor Yellow -NoNewline
+
+            if ($Wait.IsPresent)
+            {
+                Start-Sleep -Seconds 1
+                Write-Host ' : Minimun range' -ForegroundColor Yellow -NoNewline
+                Start-Sleep -Seconds 2
+                Write-Host
+                #Write-Host ' : Maximun range' -ForegroundColor Yellow -NoNewline
+            }
+        }
+        elseif ($match.Success -and $match.Value -eq $currentValue)
         {
             Write-Host $currentValue -ForegroundColor Green
         }
@@ -54,4 +65,5 @@ function Write-RegexRangeColorized
             Write-Host $currentValue -ForegroundColor Red
         }
     }
+    Write-Host "Regex: $regex" -ForegroundColor Yellow
 }
