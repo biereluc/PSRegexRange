@@ -11,12 +11,24 @@ function ConvertTo-RegexRange
             Shorthand  = $false
             Capture    = $false
             Wrap       = $true
-        }
+        },
+        [switch]$Wrap,
+        [switch]$Capture,
+        [switch]$RelaxZeros,
+        [switch]$Shorthand
     )
+
+
+    $Options = @{
+        RelaxZeros = $RelaxZeros.IsPresent
+        Shorthand  = $Shorthand.IsPresent
+        Capture    = $Capture.IsPresent
+        Wrap       = $Wrap.IsPresent
+    }
 
     #TODO isNumber min et max, car pour avoir le padding zero, il faut que le min et max soit un string ex.: 01 0123
 
-    #$key = "$min`:$max=$($Options.RelaxZeros)$($Options.Shorthand)$($Options.Capture)$($Options.Wrap)"
+    $key = "$min`:$max=$($Options.RelaxZeros)$($Options.Shorthand)$($Options.Capture)$($Options.Wrap)"
 
     #TODO get-content $tmpfile
     #if ($Global:RegexRange -and $Global:RegexRange.ContainsKey($key)) { return $Global:RegexRange[$key] }
@@ -86,7 +98,7 @@ function ConvertTo-RegexRange
 }
 
 # ! Temporary
-Get-ChildItem -Path "..\Private\*.ps1" | ForEach-Object { . $_.FullName }
+Get-ChildItem -Path '..\Private\*.ps1' | ForEach-Object { . $_.FullName }
 Get-ChildItem -Path .\Write-RegexRangeColorized.ps1 | ForEach-Object { . $_.FullName }
 
 
@@ -97,7 +109,7 @@ Write-RegexRangeColorized -Min $min -Max $max
 
 #! Test
 0..15 | ForEach-Object {
-    $max = Get-Random -Maximum 100000 -Minimum 1
+    $max = Get-Random -Maximum 1000 -Minimum 1
     $min = Get-Random -Maximum $max -Minimum 0
     Write-RegexRangeColorized -Min $min -Max $max
     Pause
