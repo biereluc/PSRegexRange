@@ -2,15 +2,14 @@ function Write-RegexRangeColorized
 {
     [CmdletBinding()]
     param (
-        
         [Parameter(Mandatory)]
         [int]$Min,
-
         [Parameter(Mandatory = $false)]
         [int]$Max,
-
         [Parameter(Mandatory = $false)]
-        [int]$Boundary = 10
+        [int]$Boundary = 10,
+        [Parameter(Mandatory = $false)]
+        [string]$RegexRange
     )
 
     # Génère le pattern regex
@@ -56,5 +55,3 @@ function Write-RegexRangeColorized
         }
     }
 }
-
-write-RangeColorized -Min 1

@@ -85,46 +85,25 @@ function ConvertTo-RegexRange
     return $state.result
 }
 
+# ! Temporary
+Get-ChildItem -Path "..\Private\*.ps1" | ForEach-Object { . $_.FullName }
+Get-ChildItem -Path .\Write-RegexRangeColorized.ps1 | ForEach-Object { . $_.FullName }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-.\Write-RangeColorized.ps1
-.\Private\Set-RegexRangeState.ps1
-
-
+#! Test
 $Min = 16
 $Max = 115
-Write-RangeColorize -Min $min -Max $max
+Write-RegexRangeColorized -Min $min -Max $max
 
-
+#! Test
 0..15 | ForEach-Object {
     $max = Get-Random -Maximum 100000 -Minimum 1
     $min = Get-Random -Maximum $max -Minimum 0
-    Write-RangeColorize -Min $min -Max $max
+    Write-RegexRangeColorized -Min $min -Max $max
     Pause
 }
 
+#! Erreur à  corriger
 #44-579 !!!589 +10
 # 37-839 !!!-849 +10
 
