@@ -1,5 +1,6 @@
 function Test-Contains
 {
+    [CmdletBinding()]
     param (
         [Parameter(Mandatory = $false)]
         [alias ('Comparison')]

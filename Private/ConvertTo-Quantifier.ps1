@@ -1,5 +1,6 @@
 function ConvertTo-Quantifier
 {
+    [CmdletBinding()]
     param (
         [Parameter(Mandatory = $false)]
         [Alias ('Count')]

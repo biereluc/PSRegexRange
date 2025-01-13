@@ -1,5 +1,6 @@
 function Group-Digits
 {
+    [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
         [string]$Start,
@@ -8,10 +9,6 @@ function Group-Digits
     )
 
     $arr = @()
-    # if ($Start.Length -and $Stop.Length -eq 1)
-    # {
-    #     return , @( $Start, $Stop)
-    # }
     for ($i = 0; $i -lt $Start.Length; $i++)
     {
         $arr += , @($Start[$i], $Stop[$i])

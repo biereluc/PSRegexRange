@@ -1,5 +1,6 @@
 function Add-ZeroPadding
 {
+    [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
         [int]$Value,

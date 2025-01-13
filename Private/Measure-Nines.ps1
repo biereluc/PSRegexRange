@@ -1,5 +1,6 @@
 function Measure-Nines
 {
+    [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
         [int]$Min,

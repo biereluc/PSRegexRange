@@ -1,5 +1,6 @@
 function Split-ToRanges
 {
+    [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
         [int]$Min,
@@ -29,9 +30,6 @@ function Split-ToRanges
         $stop = (Measure-Zeros -Integer ($max + 1) -Zeros $zeros) - 1
     }
 
-    #!!! Trier les stops
     $stops = $stops | Sort-Object -Unique
-
-    #$stops = $stops | Sort-Object { Compare-Values $_ $stops[0] }
     return $stops
 }

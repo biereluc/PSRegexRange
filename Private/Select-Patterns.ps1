@@ -1,5 +1,6 @@
 function Select-Patterns
 {
+    [CmdletBinding()]
     param (
         [Parameter(Mandatory = $false)]
         [Alias ('Reference')]

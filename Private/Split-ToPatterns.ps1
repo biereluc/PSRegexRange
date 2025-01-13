@@ -1,5 +1,6 @@
 function Split-ToPatterns
 {
+    [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
         [int]$Min,

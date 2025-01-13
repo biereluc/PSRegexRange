@@ -1,5 +1,6 @@
 function ConvertTo-CharacterClass
 {
+    [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
         [Alias ('StartDigit')]

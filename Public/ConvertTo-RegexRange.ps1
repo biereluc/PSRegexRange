@@ -3,8 +3,16 @@ function ConvertTo-RegexRange
     [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
+        [ValidateScript({
+                if ($_ -as [int]) { return $true }
+                throw "« $_ » must be an integer"
+            })]
         [string]$Min,
         [Parameter(Mandatory)]
+        [ValidateScript({
+                if ($_ -as [int]) { return $true }
+                throw "« $_ » must be an integer"
+            })]
         [string]$Max,
         [hashtable]$Options = @{
             RelaxZeros = $true
@@ -20,7 +28,7 @@ function ConvertTo-RegexRange
 
     if ((-not $Min -as [int]) -and (-not $Max -as [int]))
     {
-        throw "Min and Max must be integers"
+        throw 'Min and Max must be integers'
     }
 
     $Options = @{
@@ -30,13 +38,12 @@ function ConvertTo-RegexRange
         Wrap       = $Wrap.IsPresent
     }
 
-    #TODO isNumber min et max, car pour avoir le padding zero, il faut que le min et max soit un string ex.: 01 0123
-
     $key = "$min`:$max=$($Options.RelaxZeros)$($Options.Shorthand)$($Options.Capture)$($Options.Wrap)"
-
-    #TODO get-content $tmpfile
-    if ($Global:RegexRange -and $Global:RegexRange.ContainsKey($key)) { return $Global:RegexRange[$key] }
-
+    $cachedResult = Get-RegexRangeState -Key $key
+    if ($cachedResult)
+    {
+        return $cachedResult.Result
+    }
 
     if ($null -eq $Max -or $Min -eq $Max)
     {
@@ -57,7 +64,7 @@ function ConvertTo-RegexRange
     }
 
     $isPadded = (Test-HasPadding -String $Min) -or (Test-HasPadding -String $Max)
-    $state = @{
+    $state = [PSCustomObject]@{
         Min = $Min
         Max = $Max
         A   = $a
@@ -84,9 +91,13 @@ function ConvertTo-RegexRange
         $positives = Split-ToPatterns -Min $a -Max $b -Tok $state -Options $Options
     }
 
-    $state.Negatives = $negatives;
-    $state.Positives = $positives;
-    $state.result = Join-Patterns -Negatives $negatives -Positives $positives
+    $state | Add-Member -MemberType NoteProperty -Name 'Negatives' -Value $negatives
+    $state | Add-Member -MemberType NoteProperty -Name 'Positives' -Value $positives
+    $state | Add-Member -MemberType NoteProperty -Name 'Result' -Value (Join-Patterns -Negatives $negatives -Positives $positives)
+
+    # $state.Negatives = $negatives;
+    # $state.Positives = $positives;
+    # $state.Result = Join-Patterns -Negatives $negatives -Positives $positives
 
     if ($Options.Capture)
     {
@@ -97,13 +108,17 @@ function ConvertTo-RegexRange
         $state.result = "(?:$($state.result))"
     }
 
-    #Set-RegexRangeState -CacheKey $key -State $state -ErrorAction SilentlyContinue
+    Set-RegexRangeState -Key $key -State $state -ErrorAction SilentlyContinue
     return $state.result
 }
 
 # ! Temporary
 Get-ChildItem -Path '..\Private\*.ps1' | ForEach-Object { . $_.FullName }
 Get-ChildItem -Path .\Write-RegexRangeColorized.ps1 | ForEach-Object { . $_.FullName }
+
+ConvertTo-RegexRange -Min 10 -Max 16 | Write-RegexRangeColorized -Wait
+ConvertTo-RegexRange -Min 10 -Max 16 | Write-RegexRangeColorized -Wait
+
 
 #! Test
 0..15 | ForEach-Object {

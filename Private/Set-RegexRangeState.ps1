@@ -1,10 +1,19 @@
 function  Set-RegexRangeState
 {
+    [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
-        [string]$CacheKey,
+        [string]$Key,
         [Parameter(Mandatory)]
-        [hashtable]$State
+        [pscustomobject]$State
     )
-    [hashtable]$Global:RegexRange[$CacheKey] = $State
+    if (-not $Global:RegexRange)
+    {
+        $Global:RegexRange = @{}
+        $Global:RegexRange.Add($Key, $State)
+    }
+    elseif (-not $Global:RegexRange.ContainsKey($Key))
+    {
+        $Global:RegexRange[$Key] = $State
+    }
 }

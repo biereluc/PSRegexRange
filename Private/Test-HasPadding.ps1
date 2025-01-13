@@ -1,6 +1,7 @@
 
 function Test-HasPadding
 {
+    [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
         [string]$String

@@ -1,5 +1,6 @@
 function Join-Patterns
 {
+    [CmdletBinding()]
     param (
         [Parameter(Mandatory = $false)]
         [array]$Negatives = @(),
@@ -12,5 +13,5 @@ function Join-Patterns
     $intersected = Select-Patterns -Reference $Negatives -Comparison $Positives -Prefix '-?' -Intersection $true
     $subpatterns = $onlyNegative + $intersected + $onlyPositive
 
-    return ($subpatterns -join '|')
+    return [string]($subpatterns -join '|')
 }

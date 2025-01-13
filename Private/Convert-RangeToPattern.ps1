@@ -1,6 +1,7 @@
 
 function Convert-RangeToPattern
 {
+    [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
         [int]$Start,
