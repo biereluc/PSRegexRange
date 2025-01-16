@@ -2,11 +2,12 @@ function Write-RegexRangeColorized
 {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory)]
+        [Parameter(ValueFromPipelineByPropertyName)]
         [int]$Min,
-        [Parameter()]
+        [Parameter(ValueFromPipelineByPropertyName)]
         [int]$Max,
-        [Parameter()]
+        [Parameter(ValueFromPipelineByPropertyName)]
+        [Alias('Result')]
         [string]$Regex,
         [Parameter()]
         [int]$Boundary = 10,
@@ -34,13 +35,15 @@ function Write-RegexRangeColorized
             if ($Wait.IsPresent)
             {
                 Start-Sleep -Seconds 1
-                if ($Min -eq $currentValue){
-                Write-Host ' : Minimun range' -ForegroundColor Yellow -NoNewline
-                } else {
+                if ($Min -eq $currentValue)
+                {
+                    Write-Host ' : Minimun range' -ForegroundColor Yellow -NoNewline
+                }
+                else
+                {
                     Write-Host ' : Maximun range' -ForegroundColor Yellow -NoNewline
                 }
                 Start-Sleep -Seconds 2
-                #Write-Host ' : Maximun range' -ForegroundColor Yellow -NoNewline
             }
             Write-Host
         }
