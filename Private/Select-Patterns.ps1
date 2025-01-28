@@ -3,8 +3,7 @@ function Select-Patterns
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $false)]
-        [Alias ('Reference')]
-        [array]$Arr = @(),
+        [array]$Reference = @(),
         [Parameter(Mandatory = $false)]
         [array]$Comparison = @(),
         [Parameter(Mandatory = $false)]
@@ -15,7 +14,7 @@ function Select-Patterns
 
     $result = @()
 
-    foreach ($element in $Arr)
+    foreach ($element in $Reference)
     {
         $string = $element.String
 

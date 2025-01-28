@@ -6,5 +6,5 @@ function Test-HasPadding
         [Parameter(Mandatory)]
         [string]$String
     )
-    return $String -match '^-?(0+)\d'
+    return [bool]$String -match '^-?(0+)\d'
 }

@@ -2,11 +2,15 @@ function Write-RegexRangeColorized
 {
     [CmdletBinding()]
     param (
-        [Parameter(ValueFromPipelineByPropertyName)]
+        [Parameter(Mandatory, ValueFromPipelineByPropertyName)]
         [int]$Min,
         [Parameter(ValueFromPipelineByPropertyName)]
-        [int]$Max,
-        [Parameter(ValueFromPipelineByPropertyName)]
+        # [ValidateScript({
+        #         if ($_ -eq "" -or $_ -as [int]) { return $true }
+        #         throw "« $_ » must be an integer"
+        #     })]
+        [string]$Max = '',
+        [Parameter(Mandatory, ValueFromPipelineByPropertyName)]
         [Alias('Result')]
         [string]$Regex,
         [Parameter()]
@@ -14,27 +18,53 @@ function Write-RegexRangeColorized
         [Parameter()]
         [switch]$Wait
     )
-    if (-not $Regex)
-    {
-        $regex = ConvertTo-RegexRange -Min $Min -Max $Max
-    }
 
-
+    if (-not $Max) { $Max = $Min }
     # Test les valeurs autour de la plage
     $rangeStart = $Min - $Boundary
-    $rangeEnd = $Max + $Boundary
+    $rangeEnd = [int]$Max + $Boundary
 
     $rangeStart..$rangeEnd | ForEach-Object {
-        $currentValue = $_
+        $currentValue = $_.ToString()
         $match = [regex]::Match($currentValue, $regex)
+
+        if ($currentValue -eq -10)
+        {
+            $null = $null
+        }
+
+        if (($match.Success -and $currentValue -eq $match.Value) -or (Test-InRegexRange -Number $currentValue -RegexRange $regex -ExactMatch))
+        {
+            Write-Host $currentValue -ForegroundColor Green -NoNewline
+        }
+        else
+        {
+
+            # On récupère la valeur du match et sa position dans la chaîne
+            $matchValue = $match.Value
+            $matchIndex = $match.Index
+            $matchLength = $matchValue.Length
+
+            # On affiche la partie avant le match en rouge
+            if ($matchIndex -gt 0)
+            {
+                $beforeMatch = $currentValue.Substring(0, $matchIndex)
+                Write-Host $beforeMatch -ForegroundColor Red -NoNewline
+            }
+
+            # On affiche le match en vert
+            Write-Host $matchValue -ForegroundColor Green -NoNewline
+
+            # On affiche la partie après le match en rouge
+            $remainingString = $currentValue.Substring($matchIndex + $matchLength)
+            if (-not [string]::IsNullOrEmpty($remainingString))
+            {
+                Write-Host $remainingString -ForegroundColor Red -NoNewline
+            }
+        }
 
         if (($Min -eq $currentValue) -or ($Max -eq $currentValue))
         {
-            Write-Host $currentValue -ForegroundColor Yellow -NoNewline
-
-            if ($Wait.IsPresent)
-            {
-                Start-Sleep -Seconds 1
                 if ($Min -eq $currentValue)
                 {
                     Write-Host ' : Minimun range' -ForegroundColor Yellow -NoNewline
@@ -43,34 +73,16 @@ function Write-RegexRangeColorized
                 {
                     Write-Host ' : Maximun range' -ForegroundColor Yellow -NoNewline
                 }
-                Start-Sleep -Seconds 2
-            }
-            Write-Host
+
         }
-        elseif ($match.Success -and $match.Value -eq $currentValue)
-        {
-            Write-Host $currentValue -ForegroundColor Green
-        }
-        elseif ($match.Success)
-        {
-            $parts = $currentValue -split $match.Value
-            foreach ($part in $parts)
-            {
-                if ([string]::IsNullOrEmpty($part))
-                {
-                    Write-Host $match.Value -ForegroundColor Green -NoNewline
-                }
-                else
-                {
-                    Write-Host $part -ForegroundColor Red -NoNewline
-                }
-            }
-            Write-Host
-        }
-        else
-        {
-            Write-Host $currentValue -ForegroundColor Red
-        }
+        Write-Host
+        if ($Wait.IsPresent) { Start-Sleep -Seconds 1 }
+
     }
-    Write-Host "Regex: $regex" -ForegroundColor Yellow
+
+    if ($Wait.IsPresent)
+    {
+        Start-Sleep -Seconds 1
+    }
+
 }

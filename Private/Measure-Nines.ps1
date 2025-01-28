@@ -5,7 +5,7 @@ function Measure-Nines
         [Parameter(Mandatory)]
         [int]$Min,
         [Parameter(Mandatory)]
-        [alias ('Nines', 'NumberOfNines', 'NB')]
+        [alias ('Nines', 'NumberOfNen', 'NB')]
         [int]$Len
     )
 
@@ -17,11 +17,12 @@ function Measure-Nines
         $prefix = $minString.Substring(0, $minString.Length - $Len)
         # Ajouter les '9' répétés (1 -> 199 si y'a 2 Len)
         $resultString = $prefix + ('9' * $Len)
+        return [int]::Parse($resultString)
     }
     catch
     {
-        $resultString = -1
+        $null
     }
 
-    return [int]$resultString
+
 }

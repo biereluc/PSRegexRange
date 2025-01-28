@@ -20,6 +20,7 @@ function Convert-RangeToPattern
         }
     }
 
+    if ($Stop -eq 11){ }
     $zipped = Group-Digits -Start $Start -Stop $Stop
     [int]$digits = $zipped.Count
     $pattern = ''
@@ -33,7 +34,7 @@ function Convert-RangeToPattern
         {
             $pattern += $startDigit
         }
-        elseif ("$startDigit" -ne '0' -or "$stopDigit" -ne '9')
+        elseif ($startDigit -ne 0 -or $stopDigit -ne 9)
         {
             $pattern += (ConvertTo-CharacterClass -StartDigit $startDigit -StopDigit $stopDigit)
         }

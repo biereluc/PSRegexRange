@@ -10,12 +10,12 @@ function Split-ToRanges
 
     [int]$nines = 1
     [int]$zeros = 1
-    [int]$stop = 0
+    #[int]$stop = 0
 
-    [int]$stop = Measure-Nines -Min $Min -Nines $nines
+    $stop = Measure-Nines -Min $Min -Nines $nines
     $stops = @($Max)
 
-    while ($Min -le $stop -and $stop -le $max)
+    while ($null -ne $stop -and $Min -le $stop -and $stop -le $max)
     {
         $stops += $stop
         $nines += 1
@@ -23,7 +23,8 @@ function Split-ToRanges
     }
 
     $stop = (Measure-Zeros -Integer ($max + 1) -Zeros $zeros) - 1
-    while ($min -lt $stop -and $stop -le $max)
+    # while ($min -lt $stop -and $stop -le $max -and $stop -ge 0)
+    while ($min -lt $stop -and $stop -le $max -and $stop -ge 0)
     {
         $stops += $stop
         $zeros += 1

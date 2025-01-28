@@ -4,10 +4,10 @@ function ConvertTo-CharacterClass
     param (
         [Parameter(Mandatory)]
         [Alias ('StartDigit')]
-        [string]$A,
+        [int]$A,
         [Parameter(Mandatory)]
         [Alias ('StopDigit')]
-        [string]$B
+        [int]$B
     )
 
     if ($b - $a -eq 1)

@@ -10,7 +10,7 @@ function ConvertTo-Quantifier
     $start = if ($Digits.Count -gt 0) { $Digits[0] } else { 0 }
     $stop = if ($Digits.Count -gt 1) { $Digits[1] } else { '' }
 
-    if ($stop -or $start -gt 1)
+    if ($stop -gt 1 -or $start -gt 1)
     {
         if ([string]::IsNullOrEmpty($stop))
         {

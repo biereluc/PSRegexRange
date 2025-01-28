@@ -12,5 +12,6 @@ function Test-Contains
         [string]$Val
     )
 
-    return ($Arr | Where-Object { $_.$key -eq $val }).Count -gt 0
+    return [bool]($Arr | Where-Object { $_.$key -eq $val })
+    #return ($Arr | Where-Object { $_.$key -eq $val } | Measure-Object).Count -gt 0
 }
