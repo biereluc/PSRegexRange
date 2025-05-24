@@ -12,7 +12,6 @@ function Split-ToPatterns
         [hashtable]$Options
     )
 
-    [array]$ranges = @()
     [array]$ranges = Split-ToRanges -Min $Min -Max $Max
     [array]$tokens = @()
     [int]$start = $Min
@@ -20,30 +19,37 @@ function Split-ToPatterns
 
     for ($i = 0; $i -lt $ranges.Count; $i++)
     {
+
         $max = $ranges[$i]
         $obj = Convert-RangeToPattern -Start $Start.ToString() -Stop $max.ToString() -Options $Options
         $zeros = ''
 
-        if (-not $Tok.isPadded -and $prev -and $prev.pattern -eq $obj.pattern)
+        if ((-not $Tok.isPadded) -and $prev -and ($prev.pattern -eq $obj.pattern))
         {
-            if ($prev.count.Count -gt 1)
+            # Vérifier si counter est initialisé correctement
+            if ($null -eq $prev.counter)
             {
-                $prev.count.RemoveAt($prev.count.Count - 1)
+                $prev.counter = [System.Collections.ArrayList]@()
             }
-            $prev.count.Add($obj.count[0])
-            $prev.string = $prev.pattern + (ConvertTo-Quantifier -Digits $prev.count)
-            $start = $rangeMax + 1
+
+            if ($prev.counter.Count -gt 1)
+            {
+                $prev.counter.RemoveAt($prev.counter.Count - 1)
+            }
+            [void]$prev.counter.Add($obj.counter[0])
+            $prev.string = $prev.pattern + (ConvertTo-Quantifier -Digits $prev.counter) # Convert replicated pattern to quantifier. Ex: [0-9]{2}
+            $start = [int]$max + 1
             continue
         }
 
         if ($Tok.isPadded)
         {
-            $zeros = Add-ZeroPadding -Max $ranges[$i] -Tok $tok -Options $options
+            $zeros = Add-ZeroPadding -Value $ranges[$i] -Tok $Tok -Options $options
         }
 
-        $obj.string = $zeros + $obj.pattern + (ConvertTo-Quantifier -Digits $obj.count)
+        $obj.string = $zeros + $obj.pattern + (ConvertTo-Quantifier -Digits $obj.counter) #
         $tokens += $obj
-        $start = [int]$ranges[$i] + 1
+        $start = [int]$max + 1
         $prev = $obj
     }
 

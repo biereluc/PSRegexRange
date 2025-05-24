@@ -10,27 +10,33 @@ function Split-ToRanges
 
     [int]$nines = 1
     [int]$zeros = 1
-    #[int]$stop = 0
-
-    $stop = Measure-Nines -Min $Min -Nines $nines
+    [int]$stop = Measure-Nines -Min $Min -Nines $nines
     $stops = @($Max)
 
-    while ($null -ne $stop -and $Min -le $stop -and $stop -le $max)
+    while ($Min -le $stop -and $stop -le $Max)
     {
-        $stops += $stop
+
+        # Add the stop to the array if it doesn't already exist, like a new Set([max]) in JS.
+        if ($stops -notcontains $stop) { $stops += $stop }
+        #! $stops += $stop
         $nines += 1
-        $stop = Measure-Nines -Min $min -Nines $nines
+        $stopOrNull = Measure-Nines -Min $min -Nines $nines
+        if ($null -eq $stopOrNull) { break }
+        $stop = $stopOrNull
     }
 
-    $stop = (Measure-Zeros -Integer ($max + 1) -Zeros $zeros) - 1
-    # while ($min -lt $stop -and $stop -le $max -and $stop -ge 0)
-    while ($min -lt $stop -and $stop -le $max -and $stop -ge 0)
+    $stop = (Measure-Zeros -Integer ($Max + 1) -Zeros $zeros) - 1
+    while ($Min -lt $stop -and $stop -le $max)
     {
-        $stops += $stop
+        # Add the stop to the array if it doesn't already exist, like a new Set([max]) in JS.
+        if ($stops -notcontains $stop) { $stops += $stop }
+        #! $stops += $stop
         $zeros += 1
-        $stop = (Measure-Zeros -Integer ($max + 1) -Zeros $zeros) - 1
+        $stopOrNull = (Measure-Zeros -Integer ($max + 1) -Zeros $zeros) - 1
+        if ($null -eq $stopOrNull) { break }
+        $stop = $stopOrNull
     }
 
-    $stops = $stops | Sort-Object -Unique
+    [Array]::Sort($stops)
     return $stops
 }

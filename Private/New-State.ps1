@@ -7,9 +7,9 @@ function New-State
         [string]$Max
     )
 
-    $script:State = [PSCustomObject]@{
+    $state = [PSCustomObject]@{
         Min = $Min
         Max = $Max
     }
-    return $script:State
+    return $state
 }

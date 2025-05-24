@@ -15,14 +15,15 @@ function Measure-Nines
     {
         # Extraire la partie de la chaîne sans les $Len derniers caractères (156 -> 1 si y'a 2 Len)
         $prefix = $minString.Substring(0, $minString.Length - $Len)
-        # Ajouter les '9' répétés (1 -> 199 si y'a 2 Len)
-        $resultString = $prefix + ('9' * $Len)
-        return [int]::Parse($resultString)
     }
     catch
     {
-        $null
+        $prefix = ''
     }
+    # Ajouter les '9' répétés (1 -> 199 si y'a 2 Len)
+    $resultString = $prefix + ('9' * $Len)
+    return [int]::Parse($resultString)
+
 
 
 }

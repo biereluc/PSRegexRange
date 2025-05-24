@@ -1,3 +1,4 @@
+# function collatePatterns(neg, pos, options)
 function Join-Patterns
 {
     [CmdletBinding()]
@@ -11,9 +12,9 @@ function Join-Patterns
         [switch]$Reverse
     )
 
-    [array]$onlyNegative = Select-Patterns -Reference $Negatives -Comparison $Positives -Prefix '-' -Intersection $false
-    [array]$onlyPositive = Select-Patterns -Reference $Positives -Comparison $Negatives -Prefix '' -Intersection $false
-    [array]$intersected = Select-Patterns -Reference $Negatives -Comparison $Positives -Prefix '-?' -Intersection $true
+    [array]$onlyNegative = @(Select-Patterns -Reference $Negatives -Comparison $Positives -Prefix '-' -Intersection $false)
+    [array]$onlyPositive = @(Select-Patterns -Reference $Positives -Comparison $Negatives -Prefix '' -Intersection $false)
+    [array]$intersected = @(Select-Patterns -Reference $Negatives -Comparison $Positives -Prefix '-?' -Intersection $true)
     [array]$subpatterns = $onlyNegative + $intersected + $onlyPositive
 
     # Reverse the order of the patterns to prioritize detecting the longest number in the range.

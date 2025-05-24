@@ -12,6 +12,14 @@ function Test-Contains
         [string]$Val
     )
 
-    return [bool]($Arr | Where-Object { $_.$key -eq $val })
-    #return ($Arr | Where-Object { $_.$key -eq $val } | Measure-Object).Count -gt 0
+    return $null -ne ($Arr | Where-Object { $_.$key -eq $val } | Select-Object -First 1) # This is the equivalent of the JavaScript 'some()' method.
+    # Plus rapide
+    # foreach ($element in $Arr)
+    # {
+    #     if ($element.$Key -eq $Val)
+    #     {
+    #         return $true
+    #     }
+    # }
+    # return $false
 }

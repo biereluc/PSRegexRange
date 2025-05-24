@@ -2,6 +2,7 @@ function Edit-State
 {
     [CmdletBinding()]
     param(
+        [psobject]$InputState,
         [string]$Min,
         [string]$Max,
         [int]$A,
@@ -15,7 +16,7 @@ function Edit-State
 
     foreach ($param in $PSBoundParameters.GetEnumerator())
     {
-        $script:State | Add-Member -MemberType NoteProperty -Name $param.Key -Value $param.Value -Force
+        $InputState | Add-Member -MemberType NoteProperty -Name $param.Key -Value $param.Value -Force
     }
 
     if ($PSBoundParameters.ContainsKey('Result'))
@@ -25,8 +26,8 @@ function Edit-State
         $defaultDisplaySet = 'Result'
         $defaultDisplayPropertySet = New-Object System.Management.Automation.PSPropertySet('DefaultDisplayPropertySet', [string[]]$defaultDisplaySet)
         $PSStandardMembers = [System.Management.Automation.PSMemberInfo[]]@($defaultDisplayPropertySet)
-        $script:State | Add-Member MemberSet PSStandardMembers $PSStandardMembers -Force
+        $InputState | Add-Member MemberSet PSStandardMembers $PSStandardMembers -Force
     }
 
-    return $script:State
+    return $InputState
 }

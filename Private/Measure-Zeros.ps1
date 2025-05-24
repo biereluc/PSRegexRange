@@ -8,8 +8,6 @@ function Measure-Zeros
         [Parameter(Mandatory)]
         [int]$Zeros
     )
-
     $powerOfTen = [math]::Pow(10, $Zeros)
-    
     return [int]$Integer - ($Integer % $powerOfTen)
 }

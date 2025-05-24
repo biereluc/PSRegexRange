@@ -15,14 +15,13 @@ function Convert-RangeToPattern
     {
         return @{
             pattern = $Start
-            count   = @()
+            counter   = [System.Collections.ArrayList]@()
             digits  = 0
         }
     }
 
-    if ($Stop -eq 11){ }
     $zipped = Group-Digits -Start $Start -Stop $Stop
-    [int]$digits = $zipped.Count
+    [int]$digits = $zipped.Count # longeur
     $pattern = ''
     $count = 0
 
@@ -36,8 +35,9 @@ function Convert-RangeToPattern
         }
         elseif ($startDigit -ne 0 -or $stopDigit -ne 9)
         {
-            $pattern += (ConvertTo-CharacterClass -StartDigit $startDigit -StopDigit $stopDigit)
+            $pattern += (ConvertTo-CharacterClass -StartDigit $startDigit -StopDigit $stopDigit) # Create a character class ex: [1-9] [0-8] [1-4] [23]
         }
+        # Else is [0-9]
         else
         {
             $count++
@@ -51,7 +51,7 @@ function Convert-RangeToPattern
 
     return @{
         pattern = $pattern
-        count   = @($count)
+        counter   = [System.Collections.ArrayList]@($count)
         digits  = $digits
     }
 }

@@ -8,14 +8,17 @@ function Group-Digits
         [Parameter(Mandatory)]
         [int]$Stop
     )
-    [string]$Start = $Start.ToString()
-    [string]$Stop = $Stop.ToString()
+    [string]$strStart = $Start.ToString()
+    [string]$strStop = $Stop.ToString()
 
     $arr = @()
-    for ($i = 0; $i -lt $Start.Length; $i++)
+    $minLength = [Math]::Min($strStart.Length, $strStop.Length)
+    for ($i = 0; $i -lt $minLength; $i++)
     {
         # Reconvert char to int.
-        $arr += , @([int]::Parse($Start[$i]), [int]::Parse($Stop[$i]))
+        $digit1 = [int]::Parse($strStart[$i].ToString())
+        $digit2 = [int]::Parse($strStop[$i].ToString())
+        $arr += , @($digit1, $digit2)
     }
     return , $arr # Force le retour comme un tableau structuré
 }

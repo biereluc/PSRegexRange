@@ -1,4 +1,5 @@
 
+# function hasPadding(str)
 function Test-HasPadding
 {
     [CmdletBinding()]
@@ -6,5 +7,5 @@ function Test-HasPadding
         [Parameter(Mandatory)]
         [string]$String
     )
-    return [bool]$String -match '^-?(0+)\d'
+    return [bool]($String -match '^-?(0+)\d')
 }
