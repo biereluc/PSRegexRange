@@ -1,6 +1,26 @@
+<#
+    .SYNOPSIS
+
+    .DESCRIPTION
+
+    .PARAMETER
+
+    .INPUTS
+
+    .OUTPUTS
+
+    .EXAMPLE
+
+    .LINK
+
+    .NOTES
+
+    .FUNCTIONALITY
+    #>
 function Split-ToPatterns
 {
     [CmdletBinding()]
+    [OutputType([psobject[]])]
     param (
         [Parameter(Mandatory)]
         [int]$Min,
@@ -24,7 +44,7 @@ function Split-ToPatterns
         $obj = Convert-RangeToPattern -Start $Start.ToString() -Stop $max.ToString() -Options $Options
         $zeros = ''
 
-        if ((-not $Tok.isPadded) -and $prev -and ($prev.pattern -eq $obj.pattern))
+        if ($null -eq $Tok.PSObject.Properties['isPadded'] -or (-not $Tok.isPadded) -and $prev -and ($prev.pattern -eq $obj.pattern))
         {
             # Vérifier si counter est initialisé correctement
             if ($null -eq $prev.counter)
@@ -38,18 +58,18 @@ function Split-ToPatterns
             }
             [void]$prev.counter.Add($obj.counter[0])
             $prev.string = $prev.pattern + (ConvertTo-Quantifier -Digits $prev.counter) # Convert replicated pattern to quantifier. Ex: [0-9]{2}
-            $start = [int]$max + 1
+            $start = $max + 1
             continue
         }
 
-        if ($Tok.isPadded)
+        if (($Tok.PSObject.Properties['isPadded']) -and $Tok.isPadded)
         {
             $zeros = Add-ZeroPadding -Value $ranges[$i] -Tok $Tok -Options $options
         }
 
         $obj.string = $zeros + $obj.pattern + (ConvertTo-Quantifier -Digits $obj.counter) #
         $tokens += $obj
-        $start = [int]$max + 1
+        $start = $max + 1
         $prev = $obj
     }
 

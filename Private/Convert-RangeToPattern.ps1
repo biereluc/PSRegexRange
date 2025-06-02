@@ -1,4 +1,22 @@
+<#
+    .SYNOPSIS
 
+    .DESCRIPTION
+
+    .PARAMETER
+
+    .INPUTS
+
+    .OUTPUTS
+
+    .EXAMPLE
+
+    .LINK
+
+    .NOTES
+
+    .FUNCTIONALITY
+    #>
 function Convert-RangeToPattern
 {
     [CmdletBinding()]
@@ -21,7 +39,7 @@ function Convert-RangeToPattern
     }
 
     $zipped = Group-Digits -Start $Start -Stop $Stop
-    [int]$digits = $zipped.Count # longeur
+    $digits = $zipped.Count # longeur
     $pattern = ''
     $count = 0
 

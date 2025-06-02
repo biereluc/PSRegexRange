@@ -1,3 +1,22 @@
+<#
+    .SYNOPSIS
+
+    .DESCRIPTION
+
+    .PARAMETER
+
+    .INPUTS
+
+    .OUTPUTS
+
+    .EXAMPLE
+
+    .LINK
+
+    .NOTES
+
+    .FUNCTIONALITY
+    #>
 function Group-Digits
 {
     [CmdletBinding()]
@@ -8,8 +27,8 @@ function Group-Digits
         [Parameter(Mandatory)]
         [int]$Stop
     )
-    [string]$strStart = $Start.ToString()
-    [string]$strStop = $Stop.ToString()
+    $strStart = $Start.ToString()
+    $strStop = $Stop.ToString()
 
     $arr = @()
     $minLength = [Math]::Min($strStart.Length, $strStop.Length)

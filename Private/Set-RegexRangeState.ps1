@@ -1,3 +1,22 @@
+<#
+    .SYNOPSIS
+
+    .DESCRIPTION
+
+    .PARAMETER
+
+    .INPUTS
+
+    .OUTPUTS
+
+    .EXAMPLE
+
+    .LINK
+
+    .NOTES
+
+    .FUNCTIONALITY
+    #>
 function  Set-RegexRangeState
 {
     [CmdletBinding()]

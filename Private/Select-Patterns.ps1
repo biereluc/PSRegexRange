@@ -1,6 +1,26 @@
+<#
+    .SYNOPSIS
+
+    .DESCRIPTION
+
+    .PARAMETER
+
+    .INPUTS
+
+    .OUTPUTS
+
+    .EXAMPLE
+
+    .LINK
+
+    .NOTES
+
+    .FUNCTIONALITY
+    #>
 function Select-Patterns
 {
     [CmdletBinding()]
+    [OutputType([string])]
     param (
         [Parameter(Mandatory = $false)]
         [array]$Reference = @(),
@@ -19,13 +39,13 @@ function Select-Patterns
         $string = $element.String
 
         # Ajouter uniquement si les deux sont négatifs...
-        if (-not $Intersection -and -not (Test-Contains -Comparison $Comparison -Key 'string' -Value $string))
+        if (-not $Intersection -and -not (Test-ObjectContainsProperty -InputObject $Comparison -KeyName 'string' -Value $string))
         {
             $result += "$prefix$string"
         }
 
         # Ou si les deux sont positifs
-        if ($Intersection -and (Test-Contains -Comparison $Comparison -Key 'string' -Value $string))
+        if ($Intersection -and (Test-ObjectContainsProperty -InputObject $Comparison -KeyName 'string' -Value $string))
         {
             $result += "$prefix$string"
         }

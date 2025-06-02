@@ -1,7 +1,32 @@
-#function padZeros(value, tok, options)
+<#
+    .SYNOPSIS
+    Generates zero padding regex pattern based on a numeric value
+
+    .DESCRIPTION
+    Creates zero padding regex patterns for numeric values with optional relaxed quantifier.
+
+    .PARAMETER Value
+    The numeric value to be padded.
+
+    .PARAMETER Tok
+    A token state object containing configuration for padding, including MaxLen property.
+
+    .PARAMETER Options
+    Configuration options for padding, including RelaxZeros setting.
+
+    .EXAMPLE
+    Add-ZeroPadding -Value 5 -Tok @{MaxLen = 3} -Options @{RelaxZeros = $true}
+    Returns '0?' as zero padding.
+
+    .OUTPUTS
+    System.String. A string representing zero padding.
+
+    .NOTES
+    Supports flexible zero padding with optional relaxed mode.
+#>
 function Add-ZeroPadding
 {
-    [CmdletBinding()]
+    [OutputType([string])]
     param (
         [Parameter(Mandatory)]
         [int]$Value,
@@ -11,31 +36,22 @@ function Add-ZeroPadding
         $Options
     )
 
-    if (-not $Tok.isPadded)
+    if ($null -eq $Tok.PSObject.Properties['isPadded'] -and (-not $Tok.isPadded))
     {
-        return $Value
+        return $Value.ToString()
     }
 
-    $diff = [Math]::Abs($Tok.MaxLen - $Value.ToString().Length)
-    $relax = $Options.RelaxZeros -ne $false
+    $paddingDifference = [Math]::Abs($Tok.MaxLen - $Value.ToString().Length)
+    $useRelaxedQuantifiers = $Options.RelaxZeros -ne $false
 
-    switch ($diff)
+    switch ($paddingDifference)
     {
-        0
-        {
-            return ''
-        }
-        1
-        {
-            return $(if ($relax) { '0?' } else { '0' })
-        }
-        2
-        {
-            return $(if ($relax) { '0{0,2}' } else { '00' })
-        }
+        0 { return '' }
+        1 { return $(if ($useRelaxedQuantifiers) { '0?' } else { '0' }) }
+        2 { return $(if ($useRelaxedQuantifiers) { '0{0,2}' } else { '00' }) }
         default
         {
-            return $(if ($relax) { "0{0,$diff}" } else { "0{$diff}" })
+            return $(if ($useRelaxedQuantifiers) { "0{0,$paddingDifference}" } else { "0{$paddingDifference}" })
         }
     }
 }

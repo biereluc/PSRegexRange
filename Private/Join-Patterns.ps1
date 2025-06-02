@@ -1,7 +1,27 @@
 # function collatePatterns(neg, pos, options)
+<#
+    .SYNOPSIS
+
+    .DESCRIPTION
+
+    .PARAMETER
+
+    .INPUTS
+
+    .OUTPUTS
+
+    .EXAMPLE
+
+    .LINK
+
+    .NOTES
+
+    .FUNCTIONALITY
+    #>
 function Join-Patterns
 {
     [CmdletBinding()]
+    [OutputType([string])]
     param (
         [Parameter(Mandatory = $false)]
         [array]$Negatives = @(),
@@ -12,10 +32,10 @@ function Join-Patterns
         [switch]$Reverse
     )
 
-    [array]$onlyNegative = @(Select-Patterns -Reference $Negatives -Comparison $Positives -Prefix '-' -Intersection $false)
-    [array]$onlyPositive = @(Select-Patterns -Reference $Positives -Comparison $Negatives -Prefix '' -Intersection $false)
-    [array]$intersected = @(Select-Patterns -Reference $Negatives -Comparison $Positives -Prefix '-?' -Intersection $true)
-    [array]$subpatterns = $onlyNegative + $intersected + $onlyPositive
+    $onlyNegative = @(Select-Patterns -Reference $Negatives -Comparison $Positives -Prefix '-' -Intersection $false)
+    $onlyPositive = @(Select-Patterns -Reference $Positives -Comparison $Negatives -Prefix '' -Intersection $false)
+    $intersected = @(Select-Patterns -Reference $Negatives -Comparison $Positives -Prefix '-?' -Intersection $true)
+    $subpatterns = $onlyNegative + $intersected + $onlyPositive
 
     # Reverse the order of the patterns to prioritize detecting the longest number in the range.
     # This fixes the issue in the original function where shorter numbers are detected first,
@@ -23,5 +43,5 @@ function Join-Patterns
     # It's similar to using the 'RightToLeft' option in a regex match search.
     #if ($Reverse.IsPresent) { [array]::Reverse($subpatterns) }
 
-    return [string]($subpatterns -join '|')
+    return ($subpatterns -join '|')
 }

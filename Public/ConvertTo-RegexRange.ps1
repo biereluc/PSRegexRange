@@ -1,6 +1,4 @@
 
-
-#https://learn.microsoft.com/en-us/dotnet/api/system.text.regularexpressions.regexoptions?view=net-9.0
 function ConvertTo-RegexRange
 {
     [CmdletBinding(DefaultParameterSetName = 'DefaultSet')]
@@ -45,8 +43,13 @@ function ConvertTo-RegexRange
             Shorthand  = $false
             Capture    = $false
             Wrap       = $false
-        }
+        },
+        [switch]$NoCache
     )
+    
+    Set-StrictMode -Version Latest
+
+
 
     # Bypass the default options by passing a hashtable with the desired options
     # or use the correct switch to override the default options.
@@ -72,60 +75,74 @@ function ConvertTo-RegexRange
         }
     }
 
-
     $cacheKey = "$min`:$max=$($Options.RelaxZeros)$($Options.Shorthand)$($Options.Capture)$($Options.Wrap)"
-    $cachedResult = Get-RegexRangeState -Key $cacheKey
-    if ($cachedResult)
+    if (-not $NoCache.IsPresent)
     {
-        #return $cachedResult
+        $cachedResult = Get-RegexRangeState -Key $cacheKey
+        if ($cachedResult)
+        {
+            return $cachedResult
+        }
     }
 
-    # TODO : revior la manière de gérer le state, je trouve cela un peu compliqué
-    $state = New-State -Min $Min -Max $Max
+    $state = @{}
 
     # If Max is not specified or Min and Max have the same value, set it to Min
     if ([string]::IsNullOrWhiteSpace($Max) -or $Min -eq $Max)
     {
-        $state = Edit-State -InputState $state -Min $Min -Result $Min
-        Set-RegexRangeState -Key $cacheKey -State $state -ErrorAction SilentlyContinue
+        $state = @{
+            Min = $Min
+            Result = $Min
+        }
         return $state
     }
 
     [int]$a = [Math]::Min($Min, $Max)
     [int]$b = [Math]::Max($Min, $Max)
 
+    # If Min and Max are consecutive integers, return the range
     if ([Math]::Abs($a - $b) -eq 1)
     {
         $result = "$Min|$Max"
         if ($Options.capture) { $result = "($result)" }
         elseif ($Options.wrap -eq $false) { $result = $result }
-        else {
-           $result =  "(?:$result)"
+        else
+        {
+            $result = "(?:$result)"
         }
-        return Edit-State -InputState $state -Min $Min -Max $Max -A $a -B $b -Result $result
+        $state = @{
+            Min = $Min
+            Max = $Max
+            A = $a
+            B = $b
+            Result = $result
+        }
+        return $state
     }
 
-    $isPadded = (Test-HasPadding -String $Min) -or (Test-HasPadding -String $Max)
+    $isPadded = (Test-LeadingZeros -Number $Min) -or (Test-LeadingZeros -Number $Max)
 
-    $state = Edit-State -InputState $state -Min $Min -Max $Max -A $a -B $b
+    $state = $state = @{
+            Min = $Min
+            Max = $Max
+            A = $a
+            B = $b
+    }
     $positives = @()
     $negatives = @()
 
-
     if ($isPadded)
     {
-        $state = Edit-State -InputState $state -isPadded $isPadded -MaxLen $Max.ToString().Length
+        $state.isPadded = $isPadded
+        $state.MaxLen = $Max.ToString().Length
     }
 
     if ($a -lt 0)
     {
         $newMin = if ($b -lt 0) { [Math]::Abs($b) } else { 1 }
         $negatives = Split-ToPatterns -Min $newMin -Max ([Math]::Abs($a)) -Tok $state -Options $Options
-
-        $state = Edit-State -InputState $state -A 0
-        # TODO $state.A = 0
+        $state.A = 0
         $a = 0
-
     }
 
     if ($b -ge 0)
@@ -133,16 +150,17 @@ function ConvertTo-RegexRange
         $positives = Split-ToPatterns -Min $a -Max $b -Tok $state -Options $Options
     }
 
-
-    $state = Edit-State -InputState $state -Negatives $negatives -Positives $positives -Result (Join-Patterns -Negatives $negatives -Positives $positives -GreaterFirst)
+    $state.negatives = $negatives
+    $state.positives = $positives
+    $state.Result = (Join-Patterns -Negatives $negatives -Positives $positives -GreaterFirst)
 
     if ($Options.Capture)
     {
-        $state = Edit-State -InputState $state -Result "($($state.Result))"
+        $state.Result = "($($state.Result))"
     }
     elseif ($Options.Wrap -and ($positives.Count + $negatives.Count) -gt 1)
     {
-        $state = Edit-State -InputState $state -Result "(?:$($state.Result))"
+        $state.Result = "(?:$($state.Result))"
     }
 
     Set-RegexRangeState -Key $cacheKey -State $state -ErrorAction SilentlyContinue
