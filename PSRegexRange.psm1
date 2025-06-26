@@ -1,8 +1,14 @@
-Get-ChildItem -Path $PSScriptRoot -Recurse | Unblock-File
-#-Requires -Modules blabla
-#$PSModuleAutoloadingPreference = 'none'
-#Set-StrictMode -Version Latest
-#Microsoft.PowerShell.Utility\Import-LocalizedData  LocalizedData -filename PackageManagement.Resources.psd1
+<#
+.DISCLAIMER
+	THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
+	ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+	THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
+	PARTICULAR PURPOSE.
+
+	Copyright (c) Microsoft Corporation. All rights reserved.
+#>
+
+Set-StrictMode -Version Latest
 
 #Get public and private function definition files.
 $Public = @( Get-ChildItem -Path $PSScriptRoot\Public\*.ps1 -ErrorAction SilentlyContinue )
@@ -13,31 +19,15 @@ Foreach ($import in @($Public + $Private))
 {
     Try
     {
+        $import | Unblock-File -Verbose
         . $import.fullname
     }
     Catch
     {
-        Write-Error -Message "Failed to import function $($import.fullname): $_"
+        Write-Error -Message ('Failed to import function {0}: {1}' -f $import, $_)
     }
 }
 
-# Here I might...
-# Read in or create an initial config file and variable
-# Export Public functions ($Public.BaseName) for WIP modules
-# Set variables visible to the module and its functions only
-
 Export-ModuleMember -Function $Public.Basename
-
-# Set up some helper variables to make it easier to work with the module
-#$script:PSModule = $ExecutionContext.SessionState.Module
-##$script:PSModuleRoot = $script:PSModule.ModuleBase
-
-#New-Alias Install-WindowsUpdate Get-WindowsUpdate
-#New-Alias Download-WindowsUpdate Get-WindowsUpdate
-
-#$PSDefaultParameterValues.Add("Install-WindowsUpdate:Install",$true)
-#$PSDefaultParameterValues.Add("Download-WindowsUpdate:Download",$true)
-
-#Import-Module -Name $modulePath
-
-#Export-ModuleMember -Cmdlet * -Alias *
+New-Alias -Name ctrr -Value ConvertTo-RegexRange -Force -Description 'Alias for ConvertTo-RegexRange from PSRegexRange module'
+Export-ModuleMember -Cmdlet * -Alias *

@@ -20,14 +20,22 @@
 function Get-RegexRangeState
 {
     [CmdletBinding()]
+    [OutputType([hashtable])]
     param(
+        [Parameter(Mandatory = $true, Position = 0)]
+        [ValidateNotNullOrEmpty()]
+        [hashtable]$Cache,
         [Parameter(Mandatory)]
         [string]$Key
     )
 
-    if ($Global:RegexRange -and $Global:RegexRange.ContainsKey($key))
+    if ($Cache -and
+        $null -ne $Cache -and
+        $Cache -is [hashtable] -and
+        $Cache.ContainsKey($key))
     {
-        return $Global:RegexRange[$key]
+        Write-Verbose "Retrieving state for key: $key"
+        return $Cache[$key]
     }
     return $null
 }

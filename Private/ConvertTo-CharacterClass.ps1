@@ -16,10 +16,10 @@
     Returns "[1-3]"
 
     .INPUTS
-    System.Int32 representing the start and end digits of the range.
+    System.Int32, System.Int32
 
     .OUTPUTS
-    System.String representing a character class range.
+    System.String
 #>
 
 function ConvertTo-CharacterClass

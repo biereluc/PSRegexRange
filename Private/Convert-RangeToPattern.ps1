@@ -19,7 +19,7 @@
     #>
 function Convert-RangeToPattern
 {
-    [CmdletBinding()]
+    [OutputType([System.Collections.Hashtable])]
     param (
         [Parameter(Mandatory)]
         [int]$Start,
@@ -32,13 +32,13 @@ function Convert-RangeToPattern
     if ($Start -eq $Stop)
     {
         return @{
-            pattern = $Start
-            counter   = [System.Collections.ArrayList]@()
-            digits  = 0
+            Pattern = $Start
+            Counter = [System.Collections.ArrayList]@()
+            Digits  = 0
         }
     }
 
-    $zipped = Group-Digits -Start $Start -Stop $Stop
+    $zipped = Group-Digit -Start $Start -Stop $Stop
     $digits = $zipped.Count # longeur
     $pattern = ''
     $count = 0
@@ -68,8 +68,8 @@ function Convert-RangeToPattern
     }
 
     return @{
-        pattern = $pattern
-        counter   = [System.Collections.ArrayList]@($count)
-        digits  = $digits
+        Pattern = $pattern
+        Counter = [System.Collections.ArrayList]@($count)
+        Digits  = $digits
     }
 }

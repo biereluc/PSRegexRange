@@ -1,0 +1,13 @@
+# Workspace VSCode
+*.code-workspace
+
+# git
+.git/
+
+# VSCode
+.vscode/
+
+# No project files and folders
+old/
+TestResults/
+excluded/

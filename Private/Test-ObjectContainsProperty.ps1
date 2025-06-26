@@ -18,12 +18,11 @@
     System.Boolean
 
     .EXAMPLE
-    Test-ObjectContains -InputObject @($obj1, $obj2) -Key 'String' -Value '[0-9]{1}'
+    Test-ObjectContainsProperty -InputObject @($obj1, $obj2) -Key 'String' -Value '[0-9]{1}'
     Returns $true if any object in the collection has a 'String' property with the value '[0-9]{1}'.
 #>
 function Test-ObjectContainsProperty
 {
-    [CmdletBinding()]
     [OutputType([bool])]
     param (
         [Parameter(Mandatory = $false)]
@@ -38,7 +37,8 @@ function Test-ObjectContainsProperty
     )
 
     # Early return if collection is empty
-    if ($InputObject.Count -eq 0) {
+    if ($InputObject.Count -eq 0)
+    {
         return $false
     }
 

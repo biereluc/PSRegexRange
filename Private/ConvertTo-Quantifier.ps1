@@ -19,7 +19,7 @@
     #>
 function ConvertTo-Quantifier
 {
-    [CmdletBinding()]
+    [OutputType([System.String])]
     param (
         [Parameter(Mandatory = $false)]
         [Alias ('Count')]

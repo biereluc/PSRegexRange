@@ -1,38 +1,49 @@
 <#
     .SYNOPSIS
+    Sets or updates a regex range state in the global registry.
 
     .DESCRIPTION
+    Manages regex range states by storing them in a global hashtable registry.
+    Creates the global registry if it doesn't exist, or updates existing entries.
 
-    .PARAMETER
+    .PARAMETER StateKey
+    The unique identifier for the regex range state entry.
+
+    .PARAMETER RangeState
+    The state object containing regex range configuration data.
 
     .INPUTS
+    System.String, System.Management.Automation.PSCustomObject
 
     .OUTPUTS
+    None
 
     .EXAMPLE
-
-    .LINK
+    Set-RegexRangeState -Key "Pattern1" -RangeState $stateObject
 
     .NOTES
-
-    .FUNCTIONALITY
-    #>
+    Uses global variable $RegexRange as a registry for all states.
+#>
 function  Set-RegexRangeState
 {
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess = $true)]
     param (
         [Parameter(Mandatory)]
+        [AllowEmptyString()]
+        [AllowNull()]
+        [string]$Cache,        [Parameter(Mandatory)]
         [string]$Key,
         [Parameter(Mandatory)]
         [pscustomobject]$State
     )
-    if (-not $Global:RegexRange)
+
+    if ( -not $Cache)
     {
-        $Global:RegexRange = @{}
-        $Global:RegexRange.Add($Key, $State)
+        $Cache = @{ $Key = $State }
     }
-    elseif (-not $Global:RegexRange.ContainsKey($Key))
+    elseif (-not $Cache.ContainsKey($Key))
     {
-        $Global:RegexRange[$Key] = $State
+        $Cache[$Key] = $State
     }
+    return $Cache
 }
