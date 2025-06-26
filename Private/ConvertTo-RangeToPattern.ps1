@@ -17,7 +17,7 @@
 
     .FUNCTIONALITY
     #>
-function Convert-RangeToPattern
+function ConvertTo-RangeToPattern
 {
     [OutputType([System.Collections.Hashtable])]
     param (

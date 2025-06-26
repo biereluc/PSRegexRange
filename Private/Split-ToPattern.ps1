@@ -21,7 +21,7 @@ function Split-ToPattern
     {
 
         $max = $ranges[$i]
-        $obj = Convert-RangeToPattern -Start $Start.ToString() -Stop $max.ToString() -Options $Options
+        $obj = ConvertTo-RangeToPattern -Start $Start.ToString() -Stop $max.ToString() -Options $Options
         $zeros = ''
 
         if ((-not $Tok.isPadded) -and $prev -and ($prev.pattern -eq $obj.pattern))
