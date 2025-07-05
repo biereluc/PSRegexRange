@@ -36,7 +36,7 @@ function Add-ZeroPadding
         $Options
     )
 
-    if ($null -eq $Tok.PSObject.Properties['isPadded'] -and (-not $Tok.isPadded))
+    if (-not $Tok.isPadded)
     {
         return $Value.ToString()
     }

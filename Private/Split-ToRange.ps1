@@ -31,7 +31,7 @@ function Split-ToRange
     $nines = 1
     $zeros = 1
     [int]$stop = Measure-Nine -Number $Min -NumberOfNen $nines
-    $stops = @($Max)
+    [int[]]$stops = @($Max)
 
     while ($Min -le $stop -and $stop -le $Max)
     {
@@ -55,5 +55,5 @@ function Split-ToRange
     # Force the return to be an array, not a single value with a comma.
     #return ,$stops
     #TODO $stops
-    return ,$stops
+    return $stops
 }

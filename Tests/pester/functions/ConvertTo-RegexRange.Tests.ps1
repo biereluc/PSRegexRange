@@ -1,35 +1,32 @@
-#Requires -Modules Pester
+#Requires -Modules Pester, PSRegexRange
 
 BeforeDiscovery {
-    Remove-Module PSRegexRange -Force -ErrorAction SilentlyContinue
-     if (-not (Get-Module -Name PSRegexRange) -or -not (Get-Command -Name ConvertTo-RegexRange -ErrorAction SilentlyContinue)) {
-         Import-Module -Name "$PSScriptRoot\..\PSRegexRange.psd1" -Force -Verbose
-     }
+
 }
 Describe -Name 'Testing ConvertTo-RegexRange Inputs' -Tag 'Unit', 'Inputs', 'ConvertTo-RegexRange' {
     Context -Name 'When a given Min or Max is not a number' -Tag 'Min', 'Max', 'TypeOf', 'Error' {
-        It 'should be throw an error' -Test {
-            { ConvertTo-RegexRange -Min 'NotANumber' -NoCache } | Should -Throw -Because 'Min should be a number'
+        It 'Should be throw an error' -Test {
+            { ConvertTo-RegexRange -Minimum 'NotANumber' -NoCache } | Should -Throw -Because 'Min should be a number'
         }
 
-        It 'should be throw an error' -Test {
-            { ConvertTo-RegexRange -Min 1 -Max 'NotANumber' -NoCache } | Should -Throw -Because 'Max should be a number'
+        It 'Should be throw an error' -Test {
+            { ConvertTo-RegexRange -Minimum 1 -Maximum 'NotANumber' -NoCache } | Should -Throw -Because 'Max should be a number'
         }
     }
 
     Context 'Testing parameter positioning' {
         It 'Should accept positional parameters' {
-            $result = ConvertTo-RegexRange 1 10
+            $result = ConvertTo-RegexRange 1 10 -NoCache
             $result.Result | Should -Not -BeNullOrEmpty
         }
 
         It 'Should accept named parameters' {
-            $result = ConvertTo-RegexRange -Min 1 -Max 10
+            $result = ConvertTo-RegexRange -Minimum 1 -Maximum 10 -NoCache
             $result.Result | Should -Not -BeNullOrEmpty
         }
 
         It 'Should accept mixed parameters' {
-            $result = ConvertTo-RegexRange 1 -Max 10
+            $result = ConvertTo-RegexRange 1 -Maximum 10 -NoCache
             $result.Result | Should -Not -BeNullOrEmpty
         }
     }
@@ -67,7 +64,7 @@ Describe -Name 'Testing ConvertTo-RegexRange Result' -Tag 'Result', 'ConvertTo-R
         It -Name 'be able to convert a range to a regex pattern <Expected> for a given range <Min>..<Max>' -TestCases $testCases {
             param($Min, $Max, $Expected)
 
-            $result = ConvertTo-RegexRange -Min $Min -Max $Max -NoCache
+            $result = ConvertTo-RegexRange -Minimum $Min -Maximum $Max -NoCache
             $result.Result | Should -BeExactly $Expected -Because 'The result should be exactly an expected regex pattern'
         }
     }
@@ -76,7 +73,7 @@ Describe -Name 'Testing ConvertTo-RegexRange Result' -Tag 'Result', 'ConvertTo-R
         It 'match edges values in range <Min> to <Max>' -TestCases $testCases {
             param($Min, $Max)
 
-            $result = ConvertTo-RegexRange -Min $Min -Max $Max -NoCache
+            $result = ConvertTo-RegexRange -Minimum $Min -Maximum $Max -NoCache
             $pattern = "^($($result.Result))$"
             foreach ($value in $Min, $Max)
             {
@@ -88,7 +85,7 @@ Describe -Name 'Testing ConvertTo-RegexRange Result' -Tag 'Result', 'ConvertTo-R
         It 'NOT match edges values in range <Min> to <Max>' -Tag 'Edge', 'Error', 'Out-Of-Range' -TestCases $testCases {
             param($Min, $Max)
 
-            $result = ConvertTo-RegexRange -Min $Min -Max $Max -NoCache
+            $result = ConvertTo-RegexRange -Minimum $Min -Maximum $Max -NoCache
             $pattern = "^($($result.Result))$"
             # Out of range values
             foreach ($value in @(($Min - 1), ($Max + 1)))
@@ -108,7 +105,7 @@ Describe -Name 'Testing ConvertTo-RegexRange Result' -Tag 'Result', 'ConvertTo-R
                 Set-ItResult -Skipped -Because "Skipping test for large range: $Min to $Max"
                 return
             }
-            $result = ConvertTo-RegexRange -Min $Min -Max $Max -NoCache
+            $result = ConvertTo-RegexRange -Minimum $Min -Maximum $Max -NoCache
             $pattern = "^($($result.Result))$"
             foreach ($value in $Min..$Max)
             {
@@ -121,29 +118,29 @@ Describe -Name 'Testing ConvertTo-RegexRange Result' -Tag 'Result', 'ConvertTo-R
         It 'match a random value in range <Min> to <Max>' -TestCases $testCases {
             param($Min, $Max)
 
-            function Get-RandomNumber($Min, $Max)
+            function Get-RandomNumber($Minimum, $Maximum)
             {
                 if ($Min -eq $Max) { return $Min }
                 return Get-Random -Minimum $Min -Maximum $Max
             }
-            $result = ConvertTo-RegexRange -Min $Min -Max $Max -NoCache
+            $result = ConvertTo-RegexRange -Minimum $Min -Maximum $Max -NoCache
             $pattern = "^($($result.Result))$"
-            $value = Get-RandomNumber -Min $Min -Max $Max
+            $value = Get-RandomNumber -Minimum $Min -Maximum $Max
             $value.ToString() | Should -Match $pattern -Because 'The random value should be within the range'
         }
 
         It 'NOT match a random outside range value in range <Min> to <Max>' -TestCases $testCases {
             param($Min, $Max)
 
-            function Get-RandomOutsideRange ($Min, $Max)
+            function Get-RandomOutsideRange ($Minimum, $Maximum)
             {
                 $OutsideRange = Get-Random -Minimum 1
                 if ((Get-Random -Minimum 0 -Maximum 2) -eq 0) { Get-Random -Minimum ($Min - $OutsideRange) -Maximum $Min }
                 else { Get-Random -Minimum ($Max + 1) -Maximum ($Max + $OutsideRange + 1) }
             }
-            $result = ConvertTo-RegexRange -Min $Min -Max $Max -NoCache
+            $result = ConvertTo-RegexRange -Minimum $Min -Maximum $Max -NoCache
             $pattern = "^($($result.Result))$"
-            $value = Get-RandomOutsideRange -Min $Min -Max $Max
+            $value = Get-RandomOutsideRange -Minimum $Min -Maximum $Max
             $value.ToString() | Should -Not -Match $pattern -Because 'The random value should be outside the range'
         }
     }

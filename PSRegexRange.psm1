@@ -28,6 +28,8 @@ Foreach ($import in @($Public + $Private))
     }
 }
 
-Export-ModuleMember -Function $Public.Basename
-New-Alias -Name ctrr -Value ConvertTo-RegexRange -Force -Description 'Alias for ConvertTo-RegexRange from PSRegexRange module'
-Export-ModuleMember -Cmdlet * -Alias *
+
+
+New-Alias -Name ctrr -Value ConvertTo-RegexRange -Force -Description 'Alias for ConvertTo-RegexRange from PSRegexRange module' -Verbose
+Export-ModuleMember -Function 'ConvertTo-RegexRange', 'Test-InRegexRange' -Verbose
+Export-ModuleMember -Alias * -Cmdlet * -Verbose

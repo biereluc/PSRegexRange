@@ -16,15 +16,25 @@ param (
     $NoError
 )
 
-$Global:moduleName = 'PSRegexRange'
-$Global:moduleRoot = "$PSScriptRoot\.."
+$moduleName = 'PSRegexRange'
+$moduleRoot = [System.IO.Path]::GetFullPath((Join-Path -Path $PSScriptRoot -ChildPath '..\..'))
 
-Remove-Module $Global:moduleName -ErrorAction Ignore -Force -Verbose
-Import-Module "$Global:moduleRoot\$Global:moduleName.psd1" -Force -Verbose
-$Global:testResultsPath = New-Item -Path "$Global:moduleRoot\.." -Name TestResults -ItemType Directory -Force
+$Script:moduleRessources = @{
+    Name = $moduleName
+    Root = $moduleRoot
+    ManifestFilename = "$moduleName.psd1"
+    ModuleFilename = "$moduleName.psm1"
+    ManifestPath = Join-Path -Path $moduleRoot -ChildPath "$moduleName.psd1"
+    ModulePath = Join-Path -Path $moduleRoot -ChildPath "$moduleName.psm1"
+    PSScriptRoot = $PSScriptRoot
+    PesterRoot = $PSScriptRoot
+}
+Remove-Module $Script:moduleRessources.Name -ErrorAction Ignore -Force -Verbose
+Import-Module $Script:moduleRessources.ManifestPath -Force -Verbose
 
+# Create the test results folder if it doesn't exist
+$Script:testResultsPath = New-Item -Path "$($Script:moduleRessources.Root)\.." -Name TestResults -ItemType Directory -Force
 
-#Install-Module PSModuleDevelopment -Scope CurrentUser -ErrorAction Ignore
 Import-Module PSModuleDevelopment
 Import-Module Pester
 
@@ -36,7 +46,7 @@ $scriptAnalyzerFailures = [System.Collections.Generic.List[object]]::new()
 $config = New-PesterConfiguration
 $config.TestResult.Enabled = $true
 
-#region Run General Tests
+
 if ($TestGeneral)
 {
     Write-PSFMessage -Level Important -Message 'Modules imported, proceeding with general tests'
@@ -46,7 +56,7 @@ if ($TestGeneral)
         if ($file.Name -like $Exclude) { continue }
 
         Write-PSFMessage -Level Significant -Message "  Executing <c='em'>$($file.Name)</c>"
-        $config.TestResult.OutputPath = Join-Path $Global:testResultsPath "TEST-$($file.BaseName).xml"
+        $config.TestResult.OutputPath = Join-Path $Script:testResultsPath "TEST-$($file.BaseName).xml"
         $config.TestResult.OutputFormat = 'JUnitXml'
         $config.Run.Path = $file.FullName
         $config.Run.PassThru = $true
@@ -75,7 +85,6 @@ if ($TestGeneral)
         }
     }
 }
-#endregion Run General Tests
 
 # Print any ScriptAnalyzer output
 $scriptAnalyzerFailures | Out-Host
@@ -90,7 +99,7 @@ if ($TestFunctions)
         if ($file.Name -like $Exclude) { continue }
 
         Write-PSFMessage -Level Significant -Message "  Executing $($file.Name)"
-        $config.TestResult.OutputPath = Join-Path $Global:testResultsPath "TEST-$($file.BaseName).xml"
+        $config.TestResult.OutputPath = Join-Path $Script:testResultsPath "TEST-$($file.BaseName).xml"
         $config.Run.Path = $file.FullName
         $config.Run.PassThru = $true
         $config.Output.Verbosity = $Output

@@ -1,9 +1,15 @@
 # Based on https://github.com/pester/Pester/blob/main/tst/Help.Tests.ps1
 BeforeDiscovery {
-    $moduleName = $Global:moduleName
+    $moduleName = $Script:moduleRessources.Name
     $exportedCommands = Get-Command -Module $moduleName -CommandType Cmdlet, Function
 }
-
+Describe 'Testing module exported commands existence' -Tag 'Help', 'Acceptance', 'Command' -ForEach @{ exportedCommands = $exportedCommands } {
+    Context '<moduleName> commands is exported' {
+        It 'Has at least one command is exported' {
+            $exportedCommands | Should -Not -BeNullOrEmpty -Because 'module should export at least one command'
+        }
+    }
+}
 Describe 'Testing module help' -Tag 'Help', 'Acceptance' -ForEach @{ exportedCommands = $exportedCommands; moduleName = $moduleName } {
     Context '<_.CommandType> <_.Name>' -ForEach $exportedCommands {
         BeforeAll {
@@ -33,6 +39,11 @@ Describe 'Testing module help' -Tag 'Help', 'Acceptance' -ForEach @{ exportedCom
 
             $firstUri = $help.relatedLinks.navigationLink | Where-Object uri | Select-Object -First 1 -ExpandProperty uri
             $firstUri | Should -Be "https://github.com/biereluc/PSRegexRange/blob/main/docs/$($help.Name)" -Because 'first uri-link should be to online version of this help topic'
+        }
+
+        It 'Has documentation link to online version' -Skip:(-not (Test-Connection -ComputerName '8.8.8.8' -Count 1 -Quiet)) {
+            $firstUri = $help.relatedLinks.navigationLink | Where-Object uri | Select-Object -First 1 -ExpandProperty uri
+            (Invoke-WebRequest -Uri $firstUri -Method Head -UseBasicParsing -TimeoutSec 10).StatusCode | Should -Be 200 -Because 'online version should be reachable'
         }
 
         It 'Has at least one example' {

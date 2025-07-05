@@ -46,7 +46,7 @@ $testCases = @(
     @{ Min = -0; Max = 11; Expected = '[0-9]|1[01]' }
 )
 
-$iterations = 1000
+$iterations = 1
 $a = @()
 
 $a += foreach ($testCase in $testCases)
@@ -54,10 +54,10 @@ $a += foreach ($testCase in $testCases)
     $times = @()
 
     # Warm-up : quelques exécutions pour "chauffer" le système
-    for ($w = 0; $w -lt 10; $w++)
-    {
-        $null = ConvertTo-RegexRange -Min $testCase.Min -Max $testCase.Max -NoCache
-    }
+    # for ($w = 0; $w -lt 10; $w++)
+    # {
+    #     $null = ConvertTo-RegexRange -Min $testCase.Min -Max $testCase.Max -NoCache
+    # }
 
     # Mesures réelles
     for ($i = 0; $i -lt $iterations; $i++)
@@ -85,7 +85,7 @@ $a += foreach ($testCase in $testCases)
     $standardDeviation = [math]::Sqrt($variance)
     $coefficientOfVariation = ($standardDeviation / $stats.Average) * 100
 
-    [PSCustomObject]@{
+    $tmp = [PSCustomObject]@{
         Min         = $testCase.Min
         Max         = $testCase.Max
         #MinTime     = [math]::Round($stats.Minimum, 2)
@@ -94,9 +94,11 @@ $a += foreach ($testCase in $testCases)
         MaxTime     = [math]::Round($stats.Maximum, 0)
         #StdDev      = [math]::Round($standardDeviation, 2)
         #CV_Percent  = [math]::Round($coefficientOfVariation, 2)
+        IsMatch     = $testCase.Expected -eq $result.Result
         Expected    = $testCase.Expected
-        #Result      = $result.Result
-
+        Result      = $result.Result
     }
+    $tmp
+
 }
 $a | Format-Table -AutoSize

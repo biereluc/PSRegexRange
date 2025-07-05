@@ -42,7 +42,7 @@ function ConvertTo-RegexRange
     the minimum and maximum values, the computed regex pattern, and other state information.
 
 .EXAMPLE
-    ConvertTo-RegexRange -Min 0 -Max 100
+    ConvertTo-RegexRange -Minimum 0 -Maximum 100
     Generates a regex pattern matching numbers from 0 to 100.
 
 .FUNCTIONALITY
@@ -83,21 +83,25 @@ function ConvertTo-RegexRange
     [OutputType([System.Collections.Hashtable])]
     [Alias('ctrr')]
     param (
-        [Parameter(Mandatory, Position = 0)]
+        [Parameter(Mandatory,
+            Position = 0,
+            helpmessage = 'The minimum value of the numeric range.')]
         [ValidateScript({
                 if ($_ -match '^-?\d+$') { return $true }
                 throw "« $_ » must be an integer"
             })]
-        [string]$Minimun,
+        [Alias('Min')]
+        [string]$Minimum,
 
         [Parameter(Position = 1)]
         [ValidateScript({
                 if ($_ -match '^-?\d+$') { return $true }
                 throw "« $_ » must be an integer"
             })]
+        [Alias('Max')]
         [string]$Maximum,
 
-        # Ads (?: ) to wrap the regex pattern in a non-capturing group
+        # Add (?: ) to wrap the regex pattern in a non-capturing group
         [Parameter(ParameterSetName = 'ExplicitSet')]
         [switch]$Wrap,
 
@@ -117,7 +121,7 @@ function ConvertTo-RegexRange
             Mandatory = $false,
             ParameterSetName = 'DefaultSet',
             helpmessage = 'Bypass the default options by passing a hashtable with `
-                          the desired options or use the correct switch to override the default options.'
+                        the desired options or use the correct switch to override the default options.'
         )]
         # Default options if not explicitly set
         [hashtable]$Options = @{
@@ -132,7 +136,7 @@ function ConvertTo-RegexRange
 
     begin
     {
-        #Set-StrictMode -Version Latest
+        Set-StrictMode -Version Latest
         $VerbosePreference = 'Continue'
 
         # Bypass the default options by passing a hashtable with the desired options
@@ -159,11 +163,12 @@ function ConvertTo-RegexRange
             }
         }
 
-        $cachedResult = $null
-        $cacheKey = "$Minimun`:$Maximum=$($Options.RelaxZeros)$($Options.Shorthand)$($Options.Capture)$($Options.Wrap)"
+
+        $cacheKey = "$Minimum`:$Maximum=$($Options.RelaxZeros)$($Options.Shorthand)$($Options.Capture)$($Options.Wrap)"
+        if (-not (Get-Variable -Name cachedResult -ErrorAction Ignore)) { $cachedResult = $null }
+
         if (-not $NoCache.IsPresent)
         {
-            # TODO Revoir ceci
             $cachedResult = Get-RegexRangeState -Cache $cachedResult -Key $cacheKey
             if ($cachedResult)
             {
@@ -174,25 +179,26 @@ function ConvertTo-RegexRange
 
     process
     {
+        Write-Verbose "Processing range from $Minimum to $Maximum."
         $state = @{}
 
         # If Max is not specified or Min and Max have the same value, set it to Min
-        if ([string]::IsNullOrWhiteSpace($Maximum) -or $Minimun -eq $Maximum)
+        if ([string]::IsNullOrWhiteSpace($Maximum) -or $Minimum -eq $Maximum)
         {
             $state = @{
-                Min    = $Minimun
-                Result = $Minimun
+                Min    = $Minimum
+                Result = $Minimum
             }
-            return $state
+            return # to the end block
         }
 
-        [int]$a = [Math]::Min($Minimun, $Maximum)
-        [int]$b = [Math]::Max($Minimun, $Maximum)
+        [int]$a = [Math]::Min($Minimum, $Maximum)
+        [int]$b = [Math]::Max($Minimum, $Maximum)
 
         # If Min and Max are consecutive integers, return the range
         if ([Math]::Abs($a - $b) -eq 1)
         {
-            $result = "$Minimun|$Maximum"
+            $result = "$Minimum|$Maximum"
             if ($Options.capture) { $result = "($result)" }
             elseif ($Options.wrap -eq $false) { $result = $result }
             else
@@ -200,19 +206,20 @@ function ConvertTo-RegexRange
                 $result = "(?:$result)"
             }
             $state = @{
-                Min    = $Minimun
+                Min    = $Minimum
                 Max    = $Maximum
                 A      = $a
                 B      = $b
                 Result = $result
             }
-            return $state
+            return # to the end block
+            #return $state
         }
 
-        $isPadded = (Test-LeadingZero -Number $Minimun) -or (Test-LeadingZero -Number $Maximum)
+        $isPadded = (Test-LeadingZero -Number $Minimum) -or (Test-LeadingZero -Number $Maximum)
 
         $state = $state = @{
-            Min = $Minimun
+            Min = $Minimum
             Max = $Maximum
             A   = $a
             B   = $b
@@ -224,6 +231,8 @@ function ConvertTo-RegexRange
         {
             $state.isPadded = $isPadded
             $state.MaxLen = $Maximum.ToString().Length
+        } else {
+            $state.isPadded = $false
         }
 
         if ($a -lt 0)

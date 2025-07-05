@@ -27,11 +27,12 @@
 function  Set-RegexRangeState
 {
     [CmdletBinding(SupportsShouldProcess = $true)]
+    [OutputType([hashtable])]
     param (
         [Parameter(Mandatory)]
-        [AllowEmptyString()]
         [AllowNull()]
-        [string]$Cache,        [Parameter(Mandatory)]
+        [hashtable]$Cache,
+        [Parameter(Mandatory)]
         [string]$Key,
         [Parameter(Mandatory)]
         [pscustomobject]$State

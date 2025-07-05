@@ -46,7 +46,7 @@ function Split-ToPattern
             $zeros = Add-ZeroPadding -Value $ranges[$i] -Tok $Tok -Options $options
         }
 
-        $obj.string = $zeros + $obj.pattern + (ConvertTo-Quantifier -Digits $obj.counter) #
+        $obj.string = $zeros + $obj.pattern + (ConvertTo-Quantifier -Digits $obj.counter)
         $tokens += $obj
         $start = [int]$max + 1
         $prev = $obj

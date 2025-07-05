@@ -24,7 +24,7 @@
     Author               = 'Pierre-Luc St-Laurent'
 
     # Company or vendor of this module
-    CompanyName          = 'St-Laurent'
+    CompanyName          = 'Pierre-Luc St-Laurent'
 
     # Copyright statement for this module
     Copyright            = '(c) 2025 Pierre-Luc St-Laurent. All rights reserved.'
@@ -66,7 +66,7 @@
     # FormatsToProcess = @()
 
     # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
-    NestedModules        = 'PSRegexRange.psm1'
+    # NestedModules        = @()
 
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
     FunctionsToExport    = @('ConvertTo-RegexRange', 'Test-InRegexRange')
@@ -75,7 +75,7 @@
     #CmdletsToExport      = @()
 
     # Variables to export from this module
-    VariablesToExport    = '*'
+    #VariablesToExport    = @()
 
     # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
     AliasesToExport      = @('ConvertTo-RegexRange')
@@ -98,7 +98,7 @@
             Tags = @('Regex', 'Regexp', 'RegularExpression', 'Regular-Expression', 'Range', 'Conversion', 'Pattern', 'ConvertTo')
 
             # A URL to the license for this module.
-            # LicenseUri = ''
+            LicenseUri = 'https://github.com/biereluc/PSRegexRange/blob/main/LICENSE'
 
             # A URL to the main website for this project.
             # ProjectUri = ''

@@ -23,7 +23,8 @@ function Get-RegexRangeState
     [OutputType([hashtable])]
     param(
         [Parameter(Mandatory = $true, Position = 0)]
-        [ValidateNotNullOrEmpty()]
+        [AllowNull()]
+        [AllowEmptyCollection()]
         [hashtable]$Cache,
         [Parameter(Mandatory)]
         [string]$Key

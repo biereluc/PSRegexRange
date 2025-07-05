@@ -3,7 +3,7 @@ Param (
     $SkipTest,
 
     [string[]]
-    $CommandPath = @("$PSScriptRoot/../../public/", "$PSScriptRoot/../../private/")
+    $CommandPath = @("$Script:moduleRoot\public\", "$Script:moduleRoot\private\")
 )
 
 if ($SkipTest) { return }
