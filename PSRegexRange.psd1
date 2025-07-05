@@ -101,13 +101,23 @@
             LicenseUri = 'https://github.com/biereluc/PSRegexRange/blob/main/LICENSE'
 
             # A URL to the main website for this project.
-            # ProjectUri = ''
+            ProjectUri = 'https://github.com/biereluc/PSRegexRange'
 
             # A URL to an icon representing this module.
             # IconUri = ''
 
             # ReleaseNotes of this module
-            # ReleaseNotes = ''
+            ReleaseNotes = '
+            v0.1.0 - Initial release of PSRegexRange module.
+            - Added the following functions:
+                - ConvertTo-RegexRange: Converts a range of integers into a regex pattern.
+                - Test-InRegexRange: Tests if a number is within a specified regex range.
+            - Added unit tests for ConvertTo-RegexRange function.
+            - Added documentation for ConvertTo-RegexRange function.
+            - Normalized the code style and formatting.
+            - Added module manifest (psd1) file.
+            - Pester tests for the module.
+            '
 
             # Prerelease string of this module
             # Prerelease = ''
@@ -127,5 +137,4 @@
 
     # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
     # DefaultCommandPrefix = ''
-
 }
